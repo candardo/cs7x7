@@ -18,16 +18,9 @@ function love.load()
         end
     end
 
-    -- Get a table with all empty/free tiles
+    -- Get a table with all empty/free tiles (all tiles at first)
     freeTiles = {}
-    -- getFreeTiles() -- called once only, moved below
-    for y = 1, 7 do
-         for x = 1, 7 do
-             if tiles[y][x] == '_' then
-                 table.insert(freeTiles, {y, x})
-             end
-         end
-     end
+    getFreeTiles()
 
     -- Pick the first three random tiles
     nextTiles(3)
@@ -47,39 +40,37 @@ function love.load()
     turnDone = false
 end
 
+function getFreeTiles()
+    freeTiles = {}
+    for y = 1, 7 do
+         for x = 1, 7 do
+             if tiles[y][x] == '_' then
+                 table.insert(freeTiles, {y, x})
+             end
+         end
+     end
 
--- Get a table with all the free tiles
--- TODO called once. Move to love.load?
--- function getFreeTiles()
---     for y = 1, 7 do
---          for x = 1, 7 do
---              if tiles[y][x] == '_' then
---                  table.insert(freeTiles, {y, x})
---              end
---          end
---      end
---  end
-
+end
 
 -- Get n random tiles from freeTiles with random color
 function nextTiles(n)
     -- Color table keys
     local colorKeys = {'r', 'g', 'b', 'y', 'p'}
 
----@diagnostic disable-next-line: unused-local
     for i = 1, n do
         -- Get random index for freeTile and random color
         local freeTileIndex = love.math.random(#freeTiles)
-        print(freeTileIndex)
+        print('random index ' .. freeTileIndex)
         local randomColorKey = colorKeys[love.math.random(5)]
         -- Get random tile coordinates
         local randomTileY = freeTiles[freeTileIndex][1]
         local randomTileX = freeTiles[freeTileIndex][2]
         -- Add new random tile to tiles and remove it from freeTiles
+        print('placing tile at x ' .. randomTileX .. ' y ' .. randomTileY .. ' color ' .. randomColorKey)
         tiles[randomTileY][randomTileX] = randomColorKey
         table.remove(freeTiles,freeTileIndex)
+    print('free tiles left ' .. #freeTiles)
     end
-    print(#freeTiles)
 end
 
 
@@ -93,7 +84,7 @@ function love.update(dt)
     -- New tiles when turn is done
     if turnDone == true then
         -- clearLines()
-        print(#freeTiles)
+        -- print(#freeTiles)
         turnDone = false
         nextTiles(3)
     end
@@ -203,7 +194,9 @@ function love.keypressed(key)
             tilePicked = false
             -- Fix tiles and freeTiles
             tiles[cursorY][cursorX] = pickedTileColor
+            -- TODO doesn't remove this tile from freeTiles!
             -- table.insert(freeTiles, {pickedTileY, pickedTileX})
+            getFreeTiles()
             cursorColor = {0, 0, 0}
             -- If the tile has moved from its original position the turn is done
             if (cursorX == pickedTileX) and (cursorY == pickedTileY) then
@@ -230,11 +223,11 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle('fill', 0, 0, 2 + 50 * 7, 2 + 50 * 7)
     -- Draw tiles
-    for i = 0, 6 do
-        for j = 0, 6 do
+    for y = 1, 7 do
+        for x = 1, 7 do
             -- Get tile color and draw a tile
-            love.graphics.setColor(colors[tiles[j + 1][i + 1]])
-            love.graphics.rectangle('fill', 2 + (i * 50), 2 + (j * 50), 48, 48)
+            love.graphics.setColor(colors[tiles[y][x]])
+            love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 2 + ((y - 1) * 50), 48, 48)
        end
     end
 
