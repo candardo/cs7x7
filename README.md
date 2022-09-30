@@ -20,9 +20,6 @@ When the game starts the grid is empty and three tiles with a random color are p
 TODO
 
 - check for lined tile on four possible directions: horizontal, vertical, diagonal (both slopes)
-- freeTiles managment needs refactoring (updated in different ways when tiles are moved or placed randomly
 
 REFACTOR
 
-- cursor color in love.draw
-- manage keyboard input depending on tilePicked
