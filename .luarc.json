@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+    "Lua.diagnostics.disable": [
+        "lowercase-global"
+    ],
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.workspace.library": [
+        "/home/leo/.config/nvim",
+        "/home/leo/.local/share/nvim/site",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/Comment.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/lualine.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/mason-lspconfig.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/mason.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/nvim-tree.lua",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/nvim-treesitter",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/nvim-web-devicons",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/packer.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/plenary.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/telescope-file-browser.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/telescope-zf-native.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/telescope.nvim",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/vim",
+        "/usr/share/nvim/site",
+        "/usr/share/nvim/runtime",
+        "/home/leo/.local/share/nvim/site/pack/packer/start/vim/after",
+        "${3rd}/love2d/library"
+    ]
+}
