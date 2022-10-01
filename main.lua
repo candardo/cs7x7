@@ -18,7 +18,8 @@ function love.load()
         end
     end
 
-    -- Get a table with all empty/free tiles (all tiles at first)
+    -- Get a table with all free tiles coordinates
+    freeTiles = {}
     getFreeTiles()
 
     -- Pick the first three random tiles
@@ -38,6 +39,8 @@ function love.load()
     turnDone = false
 end
 
+
+-- Refresh freeTiles table with free tiles coordinates
 function getFreeTiles()
     freeTiles = {}
     for y = 1, 7 do
@@ -78,15 +81,47 @@ function love.update(dt)
 
     -- New tiles when turn is done
     if turnDone == true then
-        -- clearLines()
-        -- print(#freeTiles)
         turnDone = false
         nextTiles(3)
+        -- Check if the new tiles form a line to be cleared
+        clearLines()
     end
 end
 
 
+-- Clear lines of four or more contiguous tiles of the same colour
 function clearLines()
+
+    -- TODO set turnDone to false if a line is cleared
+
+    -- Horizontal scan
+    for y = 1, 7 do
+        print('checking row')
+        line = {r = {}, g = {}, b = {}, y = {}, p = {}}
+        for x = 1, 7 do
+            color = tiles[y][x]
+            if color ~= '_' then
+                table.insert(line[color], x)
+            end
+        end
+        for k, v in pairs(line) do
+            print(k .. ' color, num ' .. #v)
+            -- 4 or more tiles of the same color in table v
+            if #v > 3 then
+                -- check if consecutive
+                local delTiles = {}
+                local currentTile = nil
+            end
+
+        end
+        -- print('r ' .. #line.r)
+        -- print('g ' .. #line.g)
+        -- print('b ' .. #line.b)
+        -- print('y ' .. #line.y)
+        -- print('p ' .. #line.p)
+    end
+end
+
 
     -- Different approach
     -- scan trough line and count num of tiles of the same color
@@ -127,7 +162,7 @@ function clearLines()
     --         print(lineColor .. n)
     --     end
     -- end
-end
+-- end
 
 
 function love.keypressed(key)
@@ -173,12 +208,16 @@ function love.keypressed(key)
             -- Turn is done if the tile has moved from its original position
             if (cursorX ~= pickedTileX) or (cursorY ~= pickedTileY) then
                 turnDone = true
+                -- Check for lines to be cleared
+                clearLines()
             end
         elseif key == 'escape' then
+            -- Abort movement: restore color and get cursor back to picked tile position
             tiles[pickedTileY][pickedTileX] = pickedTileColor
             cursorX = pickedTileX
             cursorY = pickedTileY
             tilePicked = false
+            -- TODO Do something (animation?)
             -- print('tile got back to its place')
         end
     end
