@@ -37,6 +37,9 @@ function love.load()
 
     -- Turn done when one tile has moved
     turnDone = false
+
+    -- Set window size
+    love.window.setMode(352, 352)
 end
 
 
@@ -95,74 +98,46 @@ function clearLines()
     -- TODO set turnDone to false if a line is cleared
 
     -- Horizontal scan
+    print('checking all rows')
     for y = 1, 7 do
-        print('checking row')
-        line = {r = {}, g = {}, b = {}, y = {}, p = {}}
+
+        -- tiles per color in the row
+        local line = {r = {}, g = {}, b = {}, y = {}, p = {}}
         for x = 1, 7 do
-            color = tiles[y][x]
+            local color = tiles[y][x]
             if color ~= '_' then
                 table.insert(line[color], x)
             end
         end
-        for k, v in pairs(line) do
-            print(k .. ' color, num ' .. #v)
-            -- 4 or more tiles of the same color in table v
-            if #v > 3 then
-                -- check if consecutive
-                local delTiles = {}
-                local currentTile = nil
-            end
 
+        -- check if four or more tiles of the same color
+        for k, v in pairs(line) do
+            if #v > 0 then
+                print('in row ' .. y .. ' there are ' .. #v .. ' tiles of color ' .. k)
+            end
+            if #v > 3 then
+                print('four or more tiles of the same color')
+                local first = v[1]
+                local last = v[1]
+                for i = 2, (#v) do
+                    if v[i] == (first + i - 1) then
+                        last = v[i]
+                        if last - first > 2 then
+                            print('four ' .. k .. ' tiles lined from ' .. first .. ' to ' .. last)
+                            for dx = first, last do
+                                print('clear tile at y ' .. y .. ' x ' .. dx)
+                                tiles[y][dx] = '_'
+                            end
+                        end
+                    else
+                        first = v[i]
+                        last = v[i]
+                    end
+                end
+            end
         end
-        -- print('r ' .. #line.r)
-        -- print('g ' .. #line.g)
-        -- print('b ' .. #line.b)
-        -- print('y ' .. #line.y)
-        -- print('p ' .. #line.p)
     end
 end
-
-
-    -- Different approach
-    -- scan trough line and count num of tiles of the same color
-    -- if num >4 there is only one possible line
-    -- check if tiles are contiguous
-    -- if so remove tiles and add tiles to freeTiles
-    -- do the same for the other three directions
-
-    -- Horizontal scan (7 lines)
-    -- for y = 1, 7 do
-    --     for x = 1, 7 do
-    --         -- Current tile color, possible line color and numbeer
-    --         -- of occurrences
-    --         local tileColor = tiles[y][x]
-    --         local lineColor = 'x'
-    --         local n = 0
-    --         -- tile not empty and no occurrencies yet
-    --         if tileColor ~= '_' and n == 0 then
-    --             -- firstTileX = x
-    --             -- firstTileY = y
-    --             lineColor = tileColor
-    --             n = 1
-    --         -- tile not empty and one or more occurrencies
-    --         elseif tileColor ~= '_' and n ~= 0 then
-    --             -- same color
-    --             if tileColor == lineColor then
-    --                 n = n + 1
-    --             -- different color, reset n and possible color
-    --             else
-    --                 lineColor = tileColor
-    --                 n = 0
-    --             end
-    --         -- tile empty, reset n and possibile color
-    --         else
-    --             n = 0
-    --             lineColor = 'x'
-    --         end
-    --         print(lineColor .. n)
-    --     end
-    -- end
--- end
 
 
 function love.keypressed(key)
