@@ -19,7 +19,9 @@ When the game starts the grid is empty and three tiles with a random color are p
 
 TODO
 
-- check for lined tile on four possible directions: horizontal, vertical, diagonal (both slopes)
-
-REFACTOR
-
+- clear lines on diagonal directions
+- add header with score and next tiles
+- add animations
+- add splashscreen (game name, basic instructions, keys)
+- add gameover with restart button
+- add leaderboard?

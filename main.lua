@@ -95,7 +95,7 @@ end
 -- Clear lines of four or more contiguous tiles of the same colour
 function clearLines()
 
-    -- TODO set turnDone to false if a line is cleared
+    -- set turnDone to false if a line is cleared
 
     -- Horizontal scan
     print('checking all rows')
@@ -127,6 +127,49 @@ function clearLines()
                             for dx = first, last do
                                 print('clear tile at y ' .. y .. ' x ' .. dx)
                                 tiles[y][dx] = '_'
+                                turnDone = false
+                            end
+                        end
+                    else
+                        first = v[i]
+                        last = v[i]
+                    end
+                end
+            end
+        end
+    end
+
+    -- Vertical scan
+    print('checking all columns')
+    for x = 1, 7 do
+
+        -- tiles per color in the row
+        local line = {r = {}, g = {}, b = {}, y = {}, p = {}}
+        for y = 1, 7 do
+            local color = tiles[y][x]
+            if color ~= '_' then
+                table.insert(line[color], y)
+            end
+        end
+
+        -- check if four or more tiles of the same color
+        for k, v in pairs(line) do
+            if #v > 0 then
+                print('in column ' .. x .. ' there are ' .. #v .. ' tiles of color ' .. k)
+            end
+            if #v > 3 then
+                print('four or more tiles of the same color')
+                local first = v[1]
+                local last = v[1]
+                for i = 2, (#v) do
+                    if v[i] == (first + i - 1) then
+                        last = v[i]
+                        if last - first > 2 then
+                            print('four ' .. k .. ' tiles lined from ' .. first .. ' to ' .. last)
+                            for dy = first, last do
+                                print('clear tile at y ' .. dy .. ' x ' .. x)
+                                tiles[dy][x] = '_'
+                                turnDone = false
                             end
                         end
                     else
