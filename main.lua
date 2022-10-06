@@ -40,6 +40,10 @@ function love.load()
 
     -- Set window size
     love.window.setMode(352, 352)
+
+    -- Score
+    score = 0
+
 end
 
 
@@ -92,13 +96,56 @@ function love.update(dt)
 end
 
 
+-- Returns a table with the position of four or more consecutive colors 
+-- list is a table where key = color, value = table of its positions
+function fourConsecutive(list)
+
+    -- Return a table with four or more consecutive numbers
+    local subset = {}
+
+    -- Check each color for four or more elements
+    for k, v in pairs(list) do
+        -- Four tiles of the same color (once per list)
+        if #v > 3 then
+            -- Try starting with the first element of that color
+            local first = v[1]
+            local last = v[1]
+            for i = 2, (#v) do
+                -- Adjust last if current element is consecutive to the first
+                if v[i] == (first + i - 1) then
+                    last = v[i]
+                -- Not consecutive
+                else
+                    -- Break if already found four or more consecutive elements
+                    if last - first > 2 then
+                        break
+                    -- Try again starting with the current element
+                    else
+                        first = v[i]
+                        last = v[i]
+                    end
+                end
+            end
+            -- Return the subset of at least four consecutive numbers 
+            if last - first > 2 then
+                for i = first, last do
+                    table.insert(subset, i)
+                end
+                return subset
+            end
+            -- TODO break loop?
+            break
+        end
+    end
+    -- Return empty table
+    return subset
+end
+
+
 -- Clear lines of four or more contiguous tiles of the same colour
 function clearLines()
 
-    -- set turnDone to false if a line is cleared
-
     -- Horizontal scan
-    print('checking all rows')
     for y = 1, 7 do
 
         -- tiles per color in the row
@@ -109,38 +156,18 @@ function clearLines()
                 table.insert(line[color], x)
             end
         end
-
-        -- check if four or more tiles of the same color
-        for k, v in pairs(line) do
-            if #v > 0 then
-                print('in row ' .. y .. ' there are ' .. #v .. ' tiles of color ' .. k)
-            end
-            if #v > 3 then
-                print('four or more tiles of the same color')
-                local first = v[1]
-                local last = v[1]
-                for i = 2, (#v) do
-                    if v[i] == (first + i - 1) then
-                        last = v[i]
-                        if last - first > 2 then
-                            print('four ' .. k .. ' tiles lined from ' .. first .. ' to ' .. last)
-                            for dx = first, last do
-                                print('clear tile at y ' .. y .. ' x ' .. dx)
-                                tiles[y][dx] = '_'
-                                turnDone = false
-                            end
-                        end
-                    else
-                        first = v[i]
-                        last = v[i]
-                    end
-                end
+        match = fourConsecutive(line)
+        if #match > 0 then
+            score = score + #match
+            print(score)
+            for i,v in ipairs(match) do
+                tiles[y][v] = '_'
+                turnDone = false
             end
         end
     end
 
     -- Vertical scan
-    print('checking all columns')
     for x = 1, 7 do
 
         -- tiles per color in the row
@@ -151,35 +178,65 @@ function clearLines()
                 table.insert(line[color], y)
             end
         end
-
-        -- check if four or more tiles of the same color
-        for k, v in pairs(line) do
-            if #v > 0 then
-                print('in column ' .. x .. ' there are ' .. #v .. ' tiles of color ' .. k)
-            end
-            if #v > 3 then
-                print('four or more tiles of the same color')
-                local first = v[1]
-                local last = v[1]
-                for i = 2, (#v) do
-                    if v[i] == (first + i - 1) then
-                        last = v[i]
-                        if last - first > 2 then
-                            print('four ' .. k .. ' tiles lined from ' .. first .. ' to ' .. last)
-                            for dy = first, last do
-                                print('clear tile at y ' .. dy .. ' x ' .. x)
-                                tiles[dy][x] = '_'
-                                turnDone = false
-                            end
-                        end
-                    else
-                        first = v[i]
-                        last = v[i]
-                    end
-                end
+        match = fourConsecutive(line)
+        if #match > 0 then
+            score = score + #match
+            print(score)
+            for i,v in ipairs(match) do
+                tiles[v][x] = '_'
+                turnDone = false
             end
         end
     end
+
+    -- Diagonal top-left bottom-right scan
+    for n = -3, 3 do
+
+        -- tiles per color in the diagonal
+        local diag = {r = {}, g = {}, b = {}, y = {}, p = {}}
+        for y = 1, 7 do
+            if (y+n) > 0 and (y+n) < 8 then
+                local color = tiles[y][y+n]
+                if color ~= '_' then
+                    table.insert(diag[color], y+n)
+                end
+            end
+        end
+        match = fourConsecutive(diag)
+        if #match > 0 then
+            score = score + #match
+            print(score)
+            for i,v in ipairs(match) do
+                tiles[v-n][v] = '_'
+                turnDone = false
+            end
+        end
+    end
+
+    -- Diagonal top-right to bottom-left
+    for n = 5, 11 do
+
+        -- tiles per color in the diagonal
+        local diag = {r = {}, g = {}, b = {}, y = {}, p = {}}
+        for y = 1, 7 do
+            if (n-y) > 0 and (n-y) < 8 then
+                local color = tiles[y][n-y]
+                if color ~= '_' then
+                    table.insert(diag[color], 1, n-y)
+                end
+            end
+        end
+        match = fourConsecutive(diag)
+        if #match > 0 then
+            score = score + #match
+            print(score)
+            for i,v in ipairs(match) do
+                tiles[n-v][v] = '_'
+                turnDone = false
+            end
+        end
+    end
+
 end
 
 
