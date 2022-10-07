@@ -35,6 +35,9 @@ function love.load()
     -- Turn done when one tile has moved
     turnDone = false
 
+    -- Game over
+    gameOver = false
+
     -- Set window size
     -- love.window.setMode(352, 352)
     love.window.setMode(352, 452)
@@ -71,6 +74,7 @@ function getFreeTiles()
      end
 end
 
+
 -- Get n random tiles from freeTiles with random color
 function nextTiles(n)
 
@@ -103,8 +107,9 @@ function love.update(dt)
     end
 
     -- Quit with no warnings if less than 3 tiles
-    if (#freeTiles) < 3 then
-        print('no more moves!')
+    if (#freeTiles) < level then
+        gameOver = true
+        -- print('no more moves!')
         -- love.event.quit()
     end
 
@@ -182,7 +187,6 @@ function clearLines()
         if #match > 0 then
             sfxClear:play()
             score = score + #match
-            print(score)
             for i,v in ipairs(match) do
                 tiles[y][v] = '_'
                 turnDone = false
@@ -205,7 +209,6 @@ function clearLines()
         if #match > 0 then
             sfxClear:play()
             score = score + #match
-            print(score)
             for i,v in ipairs(match) do
                 tiles[v][x] = '_'
                 turnDone = false
@@ -230,7 +233,6 @@ function clearLines()
         if #match > 0 then
             sfxClear:play()
             score = score + #match
-            print(score)
             for i,v in ipairs(match) do
                 tiles[v-n][v] = '_'
                 turnDone = false
@@ -255,7 +257,6 @@ function clearLines()
         if #match > 0 then
             sfxClear:play()
             score = score + #match
-            print(score)
             for i,v in ipairs(match) do
                 tiles[n-v][v] = '_'
                 turnDone = false
@@ -267,6 +268,14 @@ end
 
 
 function love.keypressed(key)
+
+    -- FIXME 'c' key to get three new tiles
+    if key == 'c' then
+        nextTiles(level)
+    end
+    if gameOver == true then
+        return
+    end
 
     -- Cursor movement when no tile is picked (free movement)
     if tilePicked == false then
@@ -326,7 +335,7 @@ function love.keypressed(key)
             cursorY = pickedTileY
             tilePicked = false
             -- TODO Do something (animation?)
-            -- print('tile got back to its place')
+           -- print('tile got back to its place')
         end
     end
 
@@ -352,6 +361,15 @@ function love.draw()
             love.graphics.setColor(colors[tiles[y][x]])
             love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 100 + 2 + ((y - 1) * 50), 48, 48)
        end
+    end
+
+    -- Game over, skip cursor
+    -- TODO maybe an image instead of some text
+    if gameOver == true then
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.setFont(scoreFont)
+        love.graphics.print('Game Over', 75, 200)
+        return
     end
 
     -- Draw player's cursor (black when selecting, red when moving a tile)

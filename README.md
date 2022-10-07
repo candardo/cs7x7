@@ -22,9 +22,8 @@ TODO
 - add next tiles
 - add animations
 - add splashscreen (game name, basic instructions, keys)
-- add gameover with restart button
+- better gameover handling and restart key
 - add leaderboard?
-- cleanup, remove all print statements
+- cleanup
 
-REFACTOR
 
