@@ -59,6 +59,8 @@ function love.load()
     -- Font
     scoreFont = love.graphics.newFont("K26ToyBlocks123.ttf", 30)
 
+    -- Keyboard repeat
+    love.keyboard.setKeyRepeat(true)
 end
 
 
