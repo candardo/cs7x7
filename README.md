@@ -19,7 +19,7 @@ When the game starts the grid is empty and three tiles with a random color are p
 
 TODO
 
-- add header with score and next tiles
+- add next tiles
 - add animations
 - add splashscreen (game name, basic instructions, keys)
 - add gameover with restart button

@@ -22,9 +22,6 @@ function love.load()
     freeTiles = {}
     getFreeTiles()
 
-    -- Pick the first three random tiles
-    nextTiles(3)
-
     -- Player's cursor 
     cursorX = 4
     cursorY = 4
@@ -39,16 +36,25 @@ function love.load()
     turnDone = false
 
     -- Set window size
-    love.window.setMode(352, 352)
+    -- love.window.setMode(352, 352)
+    love.window.setMode(352, 452)
 
-    -- Score
+    -- Score and level
     score = 0
+    level = 3
+
+
+    -- Pick the first three random tiles
+    nextTiles(level)
 
     -- Sounds
     sfxMove = love.audio.newSource("move.ogg", "static")
     sfxClear = love.audio.newSource("clear.ogg", "static")
     sfxPicked = love.audio.newSource("picked.ogg", "static")
     sfxAbort = love.audio.newSource("abort.ogg", "static")
+
+    -- Font
+    scoreFont = love.graphics.newFont("K26ToyBlocks123.ttf", 30)
 
 end
 
@@ -86,6 +92,16 @@ end
 
 
 function love.update(dt)
+
+    -- Bump up level
+    if score > 200 then
+        level = 6
+    elseif score > 150 then
+        level = 5
+    elseif score > 100 then
+        level = 4
+    end
+
     -- Quit with no warnings if less than 3 tiles
     if (#freeTiles) < 3 then
         print('no more moves!')
@@ -95,7 +111,7 @@ function love.update(dt)
     -- New tiles when turn is done
     if turnDone == true then
         turnDone = false
-        nextTiles(3)
+        nextTiles(level)
         -- Check if the new tiles form a line to be cleared
         clearLines()
     end
@@ -319,16 +335,22 @@ end
 
 function love.draw()
 
-    -- Draw white grid
+    -- Draw white background
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle('fill', 0, 0, 2 + 50 * 7, 2 + 50 * 7)
+    love.graphics.rectangle('fill', 0, 0, 2 + 50 * 7, 2 + 50 * 7 + 100)
+
+    -- Print score
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.setFont(scoreFont)
+    love.graphics.print('Score', 20, 20)
+    love.graphics.print(score, 20, 60)
 
     -- Draw tiles
     for y = 1, 7 do
         for x = 1, 7 do
             -- Get tile color and draw a tile
             love.graphics.setColor(colors[tiles[y][x]])
-            love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 2 + ((y - 1) * 50), 48, 48)
+            love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 100 + 2 + ((y - 1) * 50), 48, 48)
        end
     end
 
@@ -338,12 +360,12 @@ function love.draw()
     else
         love.graphics.setColor(0, 0, 0)
     end
-    love.graphics.rectangle('line', 1 + ((cursorX -1) * 50), 1 + ((cursorY - 1) * 50), 50, 50)
+    love.graphics.rectangle('line', 1 + ((cursorX -1) * 50), 100 + 1 + ((cursorY - 1) * 50), 50, 50)
 
     -- Draw picked tile inside cursor
     if tilePicked then
         love.graphics.setColor(colors[pickedTileColor])
-        love.graphics.rectangle('fill', 2 + ((cursorX -1) * 50), 2 + ((cursorY - 1) * 50), 48, 48)
+        love.graphics.rectangle('fill', 2 + ((cursorX -1) * 50), 100 + 2 + ((cursorY - 1) * 50), 48, 48)
     end
 
 end
