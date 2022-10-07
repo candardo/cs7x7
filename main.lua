@@ -44,6 +44,12 @@ function love.load()
     -- Score
     score = 0
 
+    -- Sounds
+    sfxMove = love.audio.newSource("move.ogg", "static")
+    sfxClear = love.audio.newSource("clear.ogg", "static")
+    sfxPicked = love.audio.newSource("picked.ogg", "static")
+    sfxAbort = love.audio.newSource("abort.ogg", "static")
+
 end
 
 
@@ -158,6 +164,7 @@ function clearLines()
         end
         match = fourConsecutive(line)
         if #match > 0 then
+            sfxClear:play()
             score = score + #match
             print(score)
             for i,v in ipairs(match) do
@@ -180,6 +187,7 @@ function clearLines()
         end
         match = fourConsecutive(line)
         if #match > 0 then
+            sfxClear:play()
             score = score + #match
             print(score)
             for i,v in ipairs(match) do
@@ -204,6 +212,7 @@ function clearLines()
         end
         match = fourConsecutive(diag)
         if #match > 0 then
+            sfxClear:play()
             score = score + #match
             print(score)
             for i,v in ipairs(match) do
@@ -228,6 +237,7 @@ function clearLines()
         end
         match = fourConsecutive(diag)
         if #match > 0 then
+            sfxClear:play()
             score = score + #match
             print(score)
             for i,v in ipairs(match) do
@@ -241,23 +251,24 @@ end
 
 
 function love.keypressed(key)
-    -- FIXME 'c' key to get three new tiles
-    if key == 'c' then
-        nextTiles(3)
-    end
 
     -- Cursor movement when no tile is picked (free movement)
     if tilePicked == false then
         if key == 'left' and cursorX > 1 then
             cursorX = cursorX - 1
+            sfxMove:play()
         elseif key == 'right' and cursorX < 7 then
             cursorX = cursorX + 1
+            sfxMove:play()
         elseif key == 'up' and cursorY > 1 then
             cursorY = cursorY - 1
+            sfxMove:play()
         elseif key == 'down' and cursorY < 7 then
             cursorY = cursorY + 1
+            sfxMove:play()
         elseif key == 'space' and (tiles[cursorY][cursorX] ~= '_') then
             -- Pick tile, remember coordinates and color then delete tile
+            sfxPicked:play()
             tilePicked = true
             pickedTileX = cursorX
             pickedTileY = cursorY
@@ -269,14 +280,19 @@ function love.keypressed(key)
     else
         if key == 'left' and cursorX > 1 and tiles[cursorY][cursorX - 1] == '_' then
             cursorX = cursorX - 1
+            sfxMove:play()
         elseif key == 'right' and cursorX < 7 and tiles[cursorY][cursorX + 1] == '_' then
             cursorX = cursorX + 1
+            sfxMove:play()
         elseif key == 'up' and cursorY > 1 and tiles[cursorY - 1][cursorX] == '_' then
             cursorY = cursorY - 1
+            sfxMove:play()
         elseif key == 'down' and cursorY < 7 and tiles[cursorY + 1][cursorX] == '_' then
             cursorY = cursorY + 1
+            sfxMove:play()
         elseif key == 'space' and (tiles[cursorY][cursorX] == '_') then
             -- Release tile, set color on empty tile and update freeTiles
+            sfxPicked:play()
             tilePicked = false
             tiles[cursorY][cursorX] = pickedTileColor
             getFreeTiles()
@@ -288,6 +304,7 @@ function love.keypressed(key)
             end
         elseif key == 'escape' then
             -- Abort movement: restore color and get cursor back to picked tile position
+            sfxAbort:play()
             tiles[pickedTileY][pickedTileX] = pickedTileColor
             cursorX = pickedTileX
             cursorY = pickedTileY
