@@ -19,11 +19,9 @@ When the game starts the grid is empty and three tiles with a random color are p
 
 TODO
 
-- add next tiles
 - add animations
 - add splashscreen (game name, basic instructions, keys)
 - better gameover handling and restart key
 - add leaderboard?
 - cleanup
-
-
+- add combo scores?

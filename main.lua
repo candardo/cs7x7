@@ -46,9 +46,14 @@ function love.load()
     score = 0
     level = 3
 
+    -- Pick random colors
+    nextColors = {}
+    pickColors(level)
 
-    -- Pick the first three random tiles
+    -- Pick next tiles coordinates to be drawn add random colors
+    -- then pick new colors
     nextTiles(level)
+    pickColors(level)
 
     -- Sounds
     sfxMove = love.audio.newSource("move.ogg", "static")
@@ -77,21 +82,34 @@ function getFreeTiles()
 end
 
 
--- Get n random tiles from freeTiles with random color
-function nextTiles(n)
+-- Pick n random colors
+function pickColors(n)
+
+    -- Clear previous colors
+    nextColors = {}
 
     -- Color table keys
     local colorKeys = {'r', 'g', 'b', 'y', 'p'}
+    for i = 1, n do
+        -- Get random color
+        local randomColorKey = colorKeys[love.math.random(5)]
+        table.insert(nextColors, randomColorKey)
+    end
+end
 
+
+
+-- Get n random tiles from freeTiles and add color
+function nextTiles(n)
+
+    -- Get random free tile and add color
     for i = 1, n do
         -- Get random index for freeTile and its coordinates
         local freeTileIndex = love.math.random(#freeTiles)
         local randomTileY = freeTiles[freeTileIndex][1]
         local randomTileX = freeTiles[freeTileIndex][2]
-        -- Get random color
-        local randomColorKey = colorKeys[love.math.random(5)]
-        -- Add new random tile to tiles and remove it from freeTiles
-        tiles[randomTileY][randomTileX] = randomColorKey
+        -- Add color from nextColors
+        tiles[randomTileY][randomTileX] = nextColors[i]
         getFreeTiles()
     end
 end
@@ -111,7 +129,6 @@ function love.update(dt)
     -- Quit with no warnings if less than 3 tiles
     if (#freeTiles) < level then
         gameOver = true
-        -- print('no more moves!')
         -- love.event.quit()
     end
 
@@ -119,6 +136,7 @@ function love.update(dt)
     if turnDone == true then
         turnDone = false
         nextTiles(level)
+        pickColors(level)
         -- Check if the new tiles form a line to be cleared
         clearLines()
     end
@@ -337,7 +355,6 @@ function love.keypressed(key)
             cursorY = pickedTileY
             tilePicked = false
             -- TODO Do something (animation?)
-           -- print('tile got back to its place')
         end
     end
 
@@ -355,6 +372,13 @@ function love.draw()
     love.graphics.setFont(scoreFont)
     love.graphics.print('Score', 20, 20)
     love.graphics.print(score, 20, 60)
+
+    -- Print next tiles color
+    love.graphics.print('next', 200, 20)
+    for i = 1, #nextColors do
+        love.graphics.setColor(colors[nextColors[i]])
+        love.graphics.rectangle('fill', 201 + ((i - 1) * 25), 60, 24, 24)
+    end
 
     -- Draw tiles
     for y = 1, 7 do
