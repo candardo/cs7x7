@@ -39,7 +39,6 @@ function love.load()
     gameOver = false
 
     -- Set window size
-    -- love.window.setMode(352, 352)
     love.window.setMode(352, 452)
 
     -- Score and level
@@ -50,9 +49,9 @@ function love.load()
     nextColors = {}
     pickColors(level)
 
-    -- Pick next tiles coordinates to be drawn add random colors
-    -- then pick new colors
-    nextTiles(level)
+    -- Add color to next tiles
+    -- then pick new colors again (do be displayed on top header)
+    nextTiles(#nextColors)
     pickColors(level)
 
     -- Sounds
@@ -115,30 +114,35 @@ function nextTiles(n)
 end
 
 
-function love.update(dt)
+function updateScore(n)
 
+    score = score + n
     -- Bump up level
     if score > 200 then
         level = 6
-    elseif score > 150 then
+    elseif score > 15 then
         level = 5
-    elseif score > 100 then
+    elseif score > 7 then
         level = 4
     end
+end
 
-    -- Quit with no warnings if less than 3 tiles
-    if (#freeTiles) < level then
+
+function love.update(dt)
+
+    -- Game over
+    if turnDone == true and (#freeTiles) < level then
         gameOver = true
-        -- love.event.quit()
     end
 
     -- New tiles when turn is done
     if turnDone == true then
         turnDone = false
-        nextTiles(level)
-        pickColors(level)
+        nextTiles(#nextColors)
         -- Check if the new tiles form a line to be cleared
         clearLines()
+        -- Get new colors to display
+        pickColors(level)
     end
 end
 
@@ -206,7 +210,8 @@ function clearLines()
         match = fourConsecutive(line)
         if #match > 0 then
             sfxClear:play()
-            score = score + #match
+            -- score = score + #match
+            updateScore(#match)
             for i,v in ipairs(match) do
                 tiles[y][v] = '_'
                 turnDone = false
@@ -228,7 +233,8 @@ function clearLines()
         match = fourConsecutive(line)
         if #match > 0 then
             sfxClear:play()
-            score = score + #match
+            -- score = score + #match
+            updateScore(#match)
             for i,v in ipairs(match) do
                 tiles[v][x] = '_'
                 turnDone = false
@@ -252,7 +258,8 @@ function clearLines()
         match = fourConsecutive(diag)
         if #match > 0 then
             sfxClear:play()
-            score = score + #match
+            updateScore(#match)
+            -- score = score + #match
             for i,v in ipairs(match) do
                 tiles[v-n][v] = '_'
                 turnDone = false
@@ -276,7 +283,8 @@ function clearLines()
         match = fourConsecutive(diag)
         if #match > 0 then
             sfxClear:play()
-            score = score + #match
+            -- score = score + #match
+            updateScore(#match)
             for i,v in ipairs(match) do
                 tiles[n-v][v] = '_'
                 turnDone = false
@@ -289,10 +297,7 @@ end
 
 function love.keypressed(key)
 
-    -- FIXME 'c' key to get three new tiles
-    if key == 'c' then
-        nextTiles(level)
-    end
+    -- No more interaction when game is over
     if gameOver == true then
         return
     end
