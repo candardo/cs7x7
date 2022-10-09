@@ -63,6 +63,10 @@ function love.load()
     -- Font
     scoreFont = love.graphics.newFont("K26ToyBlocks123.ttf", 30)
 
+    -- Splash and game over images
+    splashImg = love.graphics.newImage('splash.png')
+    gameOverImg = love.graphics.newImage('gameover.png')
+
     -- Keyboard repeat
     love.keyboard.setKeyRepeat(true)
 end
@@ -131,8 +135,10 @@ end
 function love.update(dt)
 
     -- Game over
-    if turnDone == true and (#freeTiles) < level then
+    if (turnDone == true and #freeTiles < level) or #freeTiles == 0 then
         gameOver = true
+        -- Stop game
+        turnDone = false
     end
 
     -- New tiles when turn is done
@@ -393,13 +399,11 @@ function love.draw()
             love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 100 + 2 + ((y - 1) * 50), 48, 48)
        end
     end
-
+    
     -- Game over, skip cursor
-    -- TODO maybe an image instead of some text
     if gameOver == true then
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.setFont(scoreFont)
-        love.graphics.print('Game Over', 75, 200)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(gameOverImg, 50, 200)
         return
     end
 
