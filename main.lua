@@ -122,11 +122,11 @@ function updateScore(n)
 
     score = score + n
     -- Bump up level
-    if score > 200 then
+    if score > 150 then
         level = 6
-    elseif score > 15 then
+    elseif score > 100 then
         level = 5
-    elseif score > 7 then
+    elseif score > 50 then
         level = 4
     end
 end
@@ -297,14 +297,25 @@ function clearLines()
             end
         end
     end
-
+    getFreeTiles()
 end
+
+
+-- function printFreeTiles()
+--     print('free tiles')
+--     for i, v in ipairs(freeTiles) do
+--         print('x ' .. v[2] .. ' y ' .. v[1])
+--     end
+-- end
 
 
 function love.keypressed(key)
 
-    -- No more interaction when game is over
+    -- Restart game
     if gameOver == true then
+        if key == 'r' then
+            love.event.quit('restart')
+        end
         return
     end
 
@@ -348,6 +359,8 @@ function love.keypressed(key)
             sfxMove:play()
         elseif key == 'space' and (tiles[cursorY][cursorX] == '_') then
             -- Release tile, set color on empty tile and update freeTiles
+            -- TODO delete me
+            -- printFreeTiles()
             sfxPicked:play()
             tilePicked = false
             tiles[cursorY][cursorX] = pickedTileColor
