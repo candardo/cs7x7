@@ -38,6 +38,9 @@ function love.load()
     -- Game over
     gameOver = false
 
+    -- Splash screen
+    splash = true
+
     -- Set window size
     love.window.setMode(352, 452)
 
@@ -99,7 +102,6 @@ function pickColors(n)
         table.insert(nextColors, randomColorKey)
     end
 end
-
 
 
 -- Get n random tiles from freeTiles and add color
@@ -190,7 +192,6 @@ function fourConsecutive(list)
                 end
                 return subset
             end
-            -- TODO break loop?
             break
         end
     end
@@ -301,21 +302,20 @@ function clearLines()
 end
 
 
--- function printFreeTiles()
---     print('free tiles')
---     for i, v in ipairs(freeTiles) do
---         print('x ' .. v[2] .. ' y ' .. v[1])
---     end
--- end
-
-
 function love.keypressed(key)
 
     -- Restart game
-    if gameOver == true then
-        if key == 'r' then
+    if key == 'r' then
+        if splash == true then
+            splash = false
+            return
+        else
             love.event.quit('restart')
         end
+    end
+
+    -- No more keyboard interaction on game over
+    if gameOver == true then
         return
     end
 
@@ -359,8 +359,6 @@ function love.keypressed(key)
             sfxMove:play()
         elseif key == 'space' and (tiles[cursorY][cursorX] == '_') then
             -- Release tile, set color on empty tile and update freeTiles
-            -- TODO delete me
-            -- printFreeTiles()
             sfxPicked:play()
             tilePicked = false
             tiles[cursorY][cursorX] = pickedTileColor
@@ -378,14 +376,19 @@ function love.keypressed(key)
             cursorX = pickedTileX
             cursorY = pickedTileY
             tilePicked = false
-            -- TODO Do something (animation?)
         end
     end
-
 end
 
 
 function love.draw()
+
+    -- Splash screen
+    if splash == true then
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(splashImg, 6, 6)
+        return
+    end
 
     -- Draw white background
     love.graphics.setColor(1, 1, 1)
@@ -412,7 +415,7 @@ function love.draw()
             love.graphics.rectangle('fill', 2 + ((x - 1) * 50), 100 + 2 + ((y - 1) * 50), 48, 48)
        end
     end
-    
+
     -- Game over, skip cursor
     if gameOver == true then
         love.graphics.setColor(1, 1, 1)
@@ -433,5 +436,4 @@ function love.draw()
         love.graphics.setColor(colors[pickedTileColor])
         love.graphics.rectangle('fill', 2 + ((cursorX -1) * 50), 100 + 2 + ((cursorY - 1) * 50), 48, 48)
     end
-
 end

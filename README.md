@@ -24,13 +24,10 @@ The player can move one tile on each turn trying to line four tiles. A tile can 
 - arrows to move the cursor
 - space bar to pick and place tiles
 - esc to abort movement when a tile is picked 
-- r restarts the game on gameover 
+- r restarts the game
 
 TODO
 
-- add splashscreen (game name, basic instructions, keys)
-- cleanup
-- package game
 - add animations?
 - add leaderboard?
 - add combo scores?
