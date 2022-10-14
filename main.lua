@@ -20,7 +20,22 @@ function love.load()
 
     -- Get a table with all free tiles coordinates
     freeTiles = {}
+    -- Each time getFreeTiles() is called freeTiles is refreshed
     getFreeTiles()
+
+    -- Score and level (start with 3 new tiles each turn, then more)
+    score = 0
+    level = 3
+
+    -- Pick random colors
+    -- pickColors() fills nextColors with #level random colors
+    nextColors = {}
+    pickColors(level)
+
+    -- Add color to next tiles
+    -- then pick new colors again (do be displayed on top header)
+    nextTiles(#nextColors)  
+    pickColors(level)
 
     -- Player's cursor 
     cursorX = 4
@@ -38,24 +53,11 @@ function love.load()
     -- Game over
     gameOver = false
 
-    -- Splash screen
+    -- Splash screen on startup
     splash = true
 
-    -- Set window size
+    -- Set window size (move it to love.conf?)
     love.window.setMode(352, 452)
-
-    -- Score and level
-    score = 0
-    level = 3
-
-    -- Pick random colors
-    nextColors = {}
-    pickColors(level)
-
-    -- Add color to next tiles
-    -- then pick new colors again (do be displayed on top header)
-    nextTiles(#nextColors)
-    pickColors(level)
 
     -- Sounds
     sfxMove = love.audio.newSource("move.ogg", "static")
@@ -70,8 +72,9 @@ function love.load()
     splashImg = love.graphics.newImage('splash.png')
     gameOverImg = love.graphics.newImage('gameover.png')
 
-    -- Keyboard repeat
+    -- Keyboard repeat (useful for cursor movements)
     love.keyboard.setKeyRepeat(true)
+
 end
 
 
@@ -88,7 +91,7 @@ function getFreeTiles()
 end
 
 
--- Pick n random colors
+-- Pick n random colors, called with level as argument
 function pickColors(n)
 
     -- Clear previous colors
@@ -105,6 +108,7 @@ end
 
 
 -- Get n random tiles from freeTiles and add color
+-- called with #nextColors as argument (same as level)
 function nextTiles(n)
 
     -- Get random free tile and add color
@@ -115,23 +119,28 @@ function nextTiles(n)
         local randomTileX = freeTiles[freeTileIndex][2]
         -- Add color from nextColors
         tiles[randomTileY][randomTileX] = nextColors[i]
+        -- One free tile less so update freeTiles
         getFreeTiles()
     end
 end
 
 
-function updateScore(n)
-
-    score = score + n
-    -- Bump up level
-    if score > 150 then
-        level = 6
-    elseif score > 100 then
-        level = 5
-    elseif score > 50 then
-        level = 4
-    end
-end
+-- TODO delete debug functions
+-- function printFreeTiles()
+--     print('free tiles ' .. #freeTiles)
+--     for i, v in ipairs(freeTiles) do
+--         print(i .. '\ttile at x ' .. v[2] .. ' y ' .. v[1])
+--     end
+-- end
+-- function printBoard()
+--     for y = 1, 7 do
+--         row = ''
+--         for x = 1, 7 do
+--             row = row .. tiles[y][x]
+--         end
+--         print(row)
+--     end
+-- end
 
 
 function love.update(dt)
@@ -146,7 +155,18 @@ function love.update(dt)
     -- New tiles when turn is done
     if turnDone == true then
         turnDone = false
+        -- Bump up level
+        if score > 150 then
+            level = 6
+        elseif score > 100 then
+            level = 5
+        elseif score > 50 then
+            level = 4
+        end
+        -- Place new tiles
         nextTiles(#nextColors)
+        -- printFreeTiles()
+        -- printBoard()
         -- Check if the new tiles form a line to be cleared
         clearLines()
         -- Get new colors to display
@@ -171,7 +191,7 @@ function fourConsecutive(list)
             local last = v[1]
             for i = 2, (#v) do
                 -- Adjust last if current element is consecutive to the first
-                if v[i] == (first + i - 1) then
+                if v[i] == (last + 1) then
                     last = v[i]
                 -- Not consecutive
                 else
@@ -217,8 +237,7 @@ function clearLines()
         match = fourConsecutive(line)
         if #match > 0 then
             sfxClear:play()
-            -- score = score + #match
-            updateScore(#match)
+            score = score + #match
             for i,v in ipairs(match) do
                 tiles[y][v] = '_'
                 turnDone = false
@@ -240,8 +259,7 @@ function clearLines()
         match = fourConsecutive(line)
         if #match > 0 then
             sfxClear:play()
-            -- score = score + #match
-            updateScore(#match)
+            score = score + #match
             for i,v in ipairs(match) do
                 tiles[v][x] = '_'
                 turnDone = false
@@ -265,8 +283,7 @@ function clearLines()
         match = fourConsecutive(diag)
         if #match > 0 then
             sfxClear:play()
-            updateScore(#match)
-            -- score = score + #match
+            score = score + #match
             for i,v in ipairs(match) do
                 tiles[v-n][v] = '_'
                 turnDone = false
@@ -290,8 +307,7 @@ function clearLines()
         match = fourConsecutive(diag)
         if #match > 0 then
             sfxClear:play()
-            -- score = score + #match
-            updateScore(#match)
+            score = score + #match
             for i,v in ipairs(match) do
                 tiles[n-v][v] = '_'
                 turnDone = false
@@ -344,7 +360,7 @@ function love.keypressed(key)
         end
 
     -- Cursor movement when a tile is picked (empty tiles only)
-    else
+    elseif tilePicked == true then
         if key == 'left' and cursorX > 1 and tiles[cursorY][cursorX - 1] == '_' then
             cursorX = cursorX - 1
             sfxMove:play()
@@ -362,16 +378,19 @@ function love.keypressed(key)
             sfxPicked:play()
             tilePicked = false
             tiles[cursorY][cursorX] = pickedTileColor
+            -- Update freeTiles
             getFreeTiles()
             -- Turn is done if the tile has moved from its original position
             if (cursorX ~= pickedTileX) or (cursorY ~= pickedTileY) then
+                -- Tile moved so end turn
                 turnDone = true
-                -- Check for lines to be cleared
+                -- But first check for lines to be cleared (if any turnDone is set to false)
                 clearLines()
             end
         elseif key == 'escape' then
             -- Abort movement: restore color and get cursor back to picked tile position
             sfxAbort:play()
+            tiles[cursorY][cursorX] = '_'
             tiles[pickedTileY][pickedTileX] = pickedTileColor
             cursorX = pickedTileX
             cursorY = pickedTileY
