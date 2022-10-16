@@ -56,6 +56,9 @@ function love.load()
     -- Splash screen on startup
     splash = true
 
+    -- Delay after new tiles are placed (.2 secs)
+    delay = 0
+
     -- Set window size (move it to love.conf?)
     love.window.setMode(352, 452)
 
@@ -126,21 +129,21 @@ end
 
 
 -- TODO delete debug functions
--- function printFreeTiles()
---     print('free tiles ' .. #freeTiles)
---     for i, v in ipairs(freeTiles) do
---         print(i .. '\ttile at x ' .. v[2] .. ' y ' .. v[1])
---     end
--- end
--- function printBoard()
---     for y = 1, 7 do
---         row = ''
---         for x = 1, 7 do
---             row = row .. tiles[y][x]
---         end
---         print(row)
---     end
--- end
+function printFreeTiles()
+    print('free tiles ' .. #freeTiles)
+    for i, v in ipairs(freeTiles) do
+        print(i .. '\ttile at x ' .. v[2] .. ' y ' .. v[1])
+    end
+end
+function printBoard()
+    for y = 1, 7 do
+        row = ''
+        for x = 1, 7 do
+            row = row .. tiles[y][x]
+        end
+        print(row)
+    end
+end
 
 
 function love.update(dt)
@@ -165,12 +168,24 @@ function love.update(dt)
         end
         -- Place new tiles
         nextTiles(#nextColors)
-        -- printFreeTiles()
-        -- printBoard()
+        printFreeTiles()
+        printBoard()
+        -- Ugly delay to show new tiles before they're cleared 
+        love.timer.sleep(.4)
         -- Check if the new tiles form a line to be cleared
         clearLines()
         -- Get new colors to display
         pickColors(level)
+        -- delay = delay + dt
+        -- if delay > 2 then
+        --     delay = 0
+        --     printFreeTiles()
+        --     printBoard()
+        --     -- Check if the new tiles form a line to be cleared
+        --     clearLines()
+        --     -- Get new colors to display
+        --     pickColors(level)
+        -- end
     end
 end
 
