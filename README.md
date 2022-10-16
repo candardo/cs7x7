@@ -4,6 +4,10 @@
 
 #### Description: puzzle game made with the LÖVE framework
 
+## RUN THE GAME
+
+[LÖVE](https://love2d.org/#download) has to be installed first. Then just double click `cs7x7.love` or type `love .` in the terminal within the main directory.
+
 ## IDEA
 
 Making a simple puzzle game with Love2d.
