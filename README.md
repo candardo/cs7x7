@@ -16,7 +16,7 @@ Making a simple puzzle game with Love2d.
 
 I choose to build a clone of and old Android game called 7x7. This game was retired from the Play Store some time ago but I did like it and it was simple enough to be re-created with lua and LÖVE as my final project. 
 
-[Here is a video](Gameplay: https://www.youtube.com/watch?v=Eh5baiga2Ig) showing the gameplay of the original game.
+[Here is a video](https://www.youtube.com/watch?v=Eh5baiga2Ig) showing the gameplay of the original game.
 
 ## GAME AREA
 
